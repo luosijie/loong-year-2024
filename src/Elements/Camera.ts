@@ -1,68 +1,80 @@
 import { gsap } from 'gsap'
-import { PerspectiveCamera, Vector3 } from 'three'
+import { PerspectiveCamera, Vector2, Vector3 } from 'three'
+import Controls from './Controls'
+import Player from './Player'
 
 // Define the relative position of the car
 // const cameraPosition = new Vector3(81.8107, -68.4092, 96.8815).normalize()
-const viewPosition = {
-    default: new Vector3(1, -1, 1).normalize(),
-    active: new Vector3(81.8107, -68.4092, 90.8815).normalize()
+
+
+
+type Pointer = {
+    down: boolean,
+    delta: Vector2
+    deltaTemp: Vector2
 }
 
-enum viewScalar {
-    Loading = 30,
-    Ready = 100,
-    Active = 30
+const OFFSET = {
+    TARGET: new Vector3(0, 0, 1),
 }
 
-interface View {
-    position: Vector3,
-    scalar: number
-}
 export default class Camera {
-    width: number
-    height: number
-    main: PerspectiveCamera
-    view: View
-    target: Vector3
+    perspective: PerspectiveCamera
+
+    radius: number
+    horizontalRadian: number
+    verticelRadian: number
+    
     constructor (width: number, height: number) {
-        this.view = {
-            position: viewPosition.default.clone(),
-            scalar: viewScalar.Loading
-        }
-        this.target = new Vector3()
 
+        this.perspective = this.createCamera(width, height)
+
+        this.radius = 10
+        this.horizontalRadian = Math.PI
+        this.verticelRadian = Math.PI / 4 * 3.5
+    }
+
+    private createCamera (width: number, height: number) {
         const camera = new PerspectiveCamera( 40, width / height, 0.1, 1000 )
-        camera.position.copy(this.view.position.clone().multiplyScalar(this.view.scalar))
         camera.up.set(0, 0, 1)
-        
-        // camera.position.copy(cameraPosition.clone().normalize().multiplyScalar(multiple))
-        camera.lookAt(new Vector3())
 
-        this.main = camera
+        return camera
     }
 
     updateSize (width:number, height:number) {
-        this.main.aspect = width / height
-        this.main.updateProjectionMatrix()
+        this.perspective.aspect = width / height
+        this.perspective.updateProjectionMatrix()
     }
 
-    ready (onComplete: () => void) {
-        gsap.to(this.view, {  scalar: viewScalar.Ready, duration: 2, onComplete })
-    }
 
-    active (target: Vector3, onComplete: () => void) {
-        gsap.timeline()
-            .to(this.target, { x: target.x, y: target.y, z: target.z, duration: 1.5}, 0)
-            .to(this.view, { scalar: viewScalar.Active, onComplete, duration: 1.5}, 0)
-    }
+    update (player:Player, controls: Controls) {
 
-    follow (target: Vector3) {
-        this.target = target
-    }
+        if (controls.pointer.down) {
+            const normalizeDelta = controls.getNormalisedPointerDelta()
+            this.horizontalRadian += normalizeDelta.x * 2
+            this.verticelRadian -= normalizeDelta.y * 2
 
-    update () {
-        this.main.position.copy(this.target).add(this.view.position.clone().multiplyScalar(this.view.scalar))
-        this.main.lookAt(this.target)
-        this.main.updateProjectionMatrix()
+            if (this.verticelRadian < 0.1) this.verticelRadian = 0.1
+            if (this.verticelRadian > Math.PI - .1) this.verticelRadian = Math.PI - .1
+        }
+
+
+        const sinPhiRadius = Math.cos(this.verticelRadian) * this.radius
+        const sphericalPosition = new Vector3(
+            sinPhiRadius * Math.sin(this.horizontalRadian),
+            sinPhiRadius * Math.cos(this.horizontalRadian),
+            this.radius * Math.sin(this.verticelRadian)
+        )
+
+        const newPosition = player.main.position.clone().add(sphericalPosition)
+        
+        // this.perspective.position.lerp(newPosition, .2)
+        this.perspective.position.copy(newPosition)
+
+        const target = new Vector3()
+        player.main.getWorldPosition(target)
+        target.add(OFFSET.TARGET)
+        this.perspective.lookAt(target)
+
     }
 }

@@ -8,23 +8,16 @@ import configResources from './config/resources'
 import World from './Elements/World'
 import { Config } from './Types'
 
+import Global from './Elements/Global'
+const global = Global.getInstance()
+
 const loader = new Loader()
 
-// Config ready to create world
-const config: Config = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    canvas: document.createElement('canvas')
-}
+
 
 let world: World
 
-// Init World
-const canvas = document.querySelector('canvas')
-if (canvas) {
-    config.canvas = canvas
-    world = new World(config)
-}
+
 
 /** Load process start */
 loader.load(configResources)
@@ -39,7 +32,10 @@ loader.onFileLoaded(() => {
 
 loader.onLoadEnd(resources => {
     gsap.to('.loading', { opacity: 0, onComplete: () => {
-        world.build(resources)
+        const canvas = document.querySelector('canvas')
+        if (canvas) {
+            world = new World(canvas, resources)
+        }
     } })
 
 })
@@ -47,25 +43,15 @@ loader.onLoadEnd(resources => {
 /** Load process end */
 
 window.addEventListener('resize', () => {
-    world.updateSize(window.innerWidth, window.innerHeight)
+    global.width = window.innerWidth
+    global.height = window.innerHeight
+
+    world && world.updateSize()
 })
 
 /***************************************************************
  * Buttons event binding
  **************************************************************/
 
-const goButton = document.querySelector('button.go')
-goButton?.addEventListener('click', () => {
-    world.active()
-})
-    
-const showInfoButton = document.querySelector('button.show-info')
-showInfoButton?.addEventListener('click', () => {
-    gsap.to('.info', { opacity: 1, display: 'flex' })
-})
 
-const closeInfoButton = document.querySelector('button.close-info')
-closeInfoButton?.addEventListener('click', () => {
-    gsap.to('.info', { opacity: 0, display: 'none' })
-})
 

@@ -1,16 +1,9 @@
-import { AxesHelper, BoxGeometry, Clock, Group, Mesh, MeshBasicMaterial, Scene, SRGBColorSpace, sRGBEncoding, Texture, Vector3, WebGLRenderer } from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
-import { Config } from '../Types'
-
+import { AxesHelper, Clock, MeshBasicMaterial, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
 
 import matcapMaterial from '@/materials/matcap'
-import groundShadowMaterial  from '@/materials/groundShadow'
 
 import Camera from './Camera'
 import checkDev from '@/utils/checkDev'
-
-import { gsap } from 'gsap'
 
 import Coin from './Coin'
 
@@ -18,6 +11,11 @@ import configLanters from '@/config/lanterns'
 import configTrees from '@/config/trees'
 import configGolds from '@/config/golds'
 import Loong from './Loong'
+import Player from './Player'
+
+import Global from './Global'
+import Controls from './Controls'
+const global = Global.getInstance()
 
 // import Sound from './Sound'
 
@@ -31,11 +29,13 @@ export default class World {
 
     clock: Clock
 
-    controls: OrbitControls
 
     canvas: HTMLCanvasElement
     renderer: WebGLRenderer
     scene: Scene
+
+    controls: Controls
+
     camera: Camera
 
     // sound: Sound
@@ -45,26 +45,29 @@ export default class World {
 
     loong: Loong
 
+    player: Player
 
-    cannonDebugger: any
-
-    constructor (config: Config) {
+    constructor (canvas: HTMLCanvasElement, resources: any) {
         this.isDev = true || checkDev()
         this.isReady = false
         this.isActive = false
 
-        this.width = config.width
-        this.height = config.height
+        this.width = window.innerWidth
+        this.height = window.innerWidth
+        this.canvas = canvas
 
         this.clock = new Clock()
 
-        this.canvas = config.canvas
         this.renderer = this.createRenderer()
         this.scene = new Scene()
+
+        this.controls = new Controls()
+
+        this.player = new Player(resources)
+
         this.camera = new Camera(this.width, this.height)
-        this.controls = new OrbitControls(this.camera.main, this.canvas)
-        this.controls.enabled = true
-        
+
+
     
 
         this.coin = new Coin()
@@ -72,16 +75,18 @@ export default class World {
         this.loong = new Loong()
 
 
-        
 
+        
+        this.build(resources)
         this.init()
         
     }
 
     private init () { 
         this.scene.add(this.loong.group)
+        this.scene.add(this.player.main)
+
         if (this.isDev) {
-            this.controls.enabled = true
             const axesHelper = new AxesHelper(50)
             this.scene.add(axesHelper)
         }
@@ -105,24 +110,17 @@ export default class World {
 
     // Passed to renderer.setAnimationLoop
     private render () {
-        const elapsedTime = this.clock.getElapsedTime()
-        
-        this.coin.update(elapsedTime)
+        const delta = this.clock.getDelta()
 
+
+        this.controls.update()
         this.loong.update()
-        
-        if (this.isReady) {
-            !this.isDev && this.camera.update()
 
-            
-        } 
+        this.player.update(delta)
+        this.camera.update(this.player, this.controls)
         
 
-        if (this.isDev) {
-            this.controls.update()
-        }
-
-        this.renderer.render( this.scene, this.camera.main )
+        this.renderer.render( this.scene, this.camera.perspective )
 
     }
 
@@ -228,40 +226,15 @@ export default class World {
 
     }
 
-    active () {
-        gsap.to('.actions', { top: -70 })
-        // this.camera.active(this.car.body.position, () => {
-
-
-        //     this.trees.build()
-        //     this.scene.add(this.trees.main)
-
-        
-        //     this.isActive = true
-        //     console.log('world is active')
-        // })
-        // this.isActive = true
-    }
-
-    refresh () {
-        this.isActive = false
-        this.camera.ready(() => {
-            gsap.to('.actions', { top: 0 })
-        })
-        // console.log('need refresh')
-    }
 
     // Update canvas size when window resizing
-    updateSize (width: number, height: number) {
-        
-        this.width = width
-        this.height = height
+    updateSize () {
 
         // update camera        
-        this.camera.updateSize(width, height)
+        this.camera.updateSize(global.width, global.height)
         
         // update renderer
-        this.renderer.setSize(width, height)
+        this.renderer.setSize(global.width, global.height)
         
     }
     

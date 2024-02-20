@@ -29,6 +29,11 @@ export default [
     { name: 'matcap-loong-white', type: LoaderType.Texture, path: '/matcaps/loong-white.webp'},
     { name: 'matcap-loong-yellow', type: LoaderType.Texture, path: '/matcaps/loong-yellow.webp'},
 
+    { name: 'model-player', type: LoaderType.GLTF, path: '/models/player.glb'},
+    { name: 'texture-player', type: LoaderType.Texture, path: '/textures/player.webp'},
+
+
+
 
     
     // { name: 'data-rail-points', type: LoaderType.PLY, path: '/models/rail-points.ply'},
