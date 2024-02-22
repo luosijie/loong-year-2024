@@ -11,6 +11,8 @@ export default class Door {
     left: Object3D
     right: Object3D
 
+    opening: boolean
+
     constructor (resources: any) {
         this.group = new Group()
 
@@ -20,7 +22,7 @@ export default class Door {
         this.group.add(this.left)
         this.group.add(this.right)
 
-        this.open()
+        this.opening = false
     }
 
 
@@ -65,11 +67,15 @@ export default class Door {
     }
 
     open () {
+        if (this.opening) return
+        this.opening = true
         gsap.to(this.left.rotation, {z: -Math.PI/2.5, duration: 1.5})
         gsap.to(this.right.rotation, {z: Math.PI/2.5, duration: 1.5})
     }
 
     close () {
+        if (!this.opening) return
+        this.opening = false
         gsap.to(this.left.rotation, {z: 0, duration: 1.5})
         gsap.to(this.right.rotation, {z: 0, duration: 1.5})
     }

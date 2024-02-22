@@ -1,9 +1,18 @@
-import { AnimationAction, AnimationClip, AnimationMixer, Group, MeshBasicMaterial, Object3D, PerspectiveCamera, Ray, Raycaster, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
+import { AnimationAction, AnimationClip, AnimationMixer, ArrowHelper, BoxGeometry, Group, Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Ray, Raycaster, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
 import Door from './Door'
+
+import fakeShadowMaterial from '@/materials/fakeShadowMaterial'
+
+import Global from './Global'
+const global = Global.getInstance()
 
 type Actions = {
     walking: AnimationAction
     jumping: AnimationAction
+}
+
+type Helpers = {
+    forward: ArrowHelper
 }
 
 
@@ -13,7 +22,7 @@ const SPEED = {
 }
 
 const RAYPOINTS = {
-    ORIGIN: new Vector3(0, 0, .5),
+    ORIGIN: new Vector3(0, 0, .6),
     DOWN: new Vector3(0, 0, -1),
     FORWARD: new Vector3(0, -1, 0)
 }
@@ -28,6 +37,7 @@ export default class Player {
     animationMixer: AnimationMixer
 
     actions: Actions
+    helpers: Helpers
 
 
     walking: boolean
@@ -37,16 +47,23 @@ export default class Player {
 
     raycaster: Raycaster
 
+    fakeShadow: Mesh
+
+
+
+
 
 
     constructor (resources: any) {
         this.main = new Object3D()
-        this.main.position.set(0, -9, 0)
+        this.main.position.set(1.4, -9.5, 0)
+        this.main.rotateZ(Math.PI /180 * 50)
 
         this.model = resources['model-player']
 
         this.scene = this.createScene(resources)
         this.animationMixer = new AnimationMixer(this.scene)
+
 
         this.actions = this.createActions()
 
@@ -60,10 +77,37 @@ export default class Player {
 
         this.initControls()
 
+
+        this.fakeShadow = this.createFakeShadow()
+
+        this.helpers = this.createHelpers()
+
+
         this.main.add(this.scene)
+        this.main.add(this.fakeShadow)
 
     }
 
+    private createFakeShadow () {
+        const geometry = new PlaneGeometry(1,1)
+        const material = fakeShadowMaterial()
+
+        const mesh = new Mesh(geometry, material)
+        mesh.position.z = .003
+
+        return mesh
+    }
+
+    private createHelpers () {
+        
+        const forward = new ArrowHelper(RAYPOINTS.FORWARD, RAYPOINTS.ORIGIN.clone(), 2, 0xff0000)
+        global.isDev && this.main.add(forward)
+
+
+        return {
+            forward
+        }
+    }
 
     private createScene (resources: any) {
 
@@ -97,7 +141,7 @@ export default class Player {
 
     private initControls() {
         window.addEventListener('keydown', (evt:KeyboardEvent) => {
-            this.walk()
+            
             switch (evt.key) {
                 // TODO: player jump
                 case 'Space' :
@@ -106,15 +150,19 @@ export default class Player {
                     break
                 case 'w':
                     this.speed = SPEED.WALKING
+                    this.walk()
                 break
                 case 's':
                     this.speed = -SPEED.WALKING
+                    this.walk()
                 break
                 case 'a':
-                        this.rotation = SPEED.ROTATION
+                    this.rotation = SPEED.ROTATION
+                    this.walk()
                     break
                 case 'd':
-                        this.rotation = -SPEED.ROTATION
+                    this.rotation = -SPEED.ROTATION
+                    this.walk()
 
             }
         })
@@ -179,12 +227,15 @@ export default class Player {
             target.getWorldPosition(rayOrigin)
             rayOrigin.add(RAYPOINTS.ORIGIN)
             
-            // intersect door
-            RAYPOINTS.FORWARD.applyQuaternion(target.quaternion)
-            this.raycaster.set(rayOrigin, RAYPOINTS.FORWARD)
-            const intersectsDoor = this.raycaster.intersectObjects(door.group.children)
-            console.log(intersectsDoor.length)
-            if (intersectsDoor.length) return
+            // TODO: intersect door
+            // RAYPOINTS.FORWARD.applyQuaternion(this.main.quaternion)
+            // this.raycaster.set(rayOrigin, RAYPOINTS.FORWARD)
+
+            // this.helpers.forward.setDirection(RAYPOINTS.FORWARD)
+
+            // const intersectsDoor = this.raycaster.intersectObjects([door.left, door.right])
+            // console.log(intersectsDoor.length)
+            // if (intersectsDoor.length) return
 
             // intersect ground
             this.raycaster.set(rayOrigin, RAYPOINTS.DOWN)
@@ -192,12 +243,19 @@ export default class Player {
             const intersects = this.raycaster.intersectObjects([navmesh])
 
             if (intersects.length > 0) {
-                this.main.position.lerp(intersects[0].point, .6)
+                const i = intersects[0]
+                this.main.position.lerp(i.point, .6)
+                if (i.object.name === 'door') {
+                    door.open()
+                } else {
+                    door.close()
+                }
             }
+
         }
 
 
-
+        console.log(this.main.position)
 
 
 

@@ -15,7 +15,7 @@ type Pointer = {
 }
 
 const OFFSET = {
-    TARGET: new Vector3(0, 0, 1),
+    TARGET: new Vector3(0, 0, .1),
 }
 
 export default class Camera {
@@ -30,8 +30,8 @@ export default class Camera {
         this.perspective = this.createCamera(width, height)
 
         this.radius = 10
-        this.horizontalRadian = 0
-        this.verticelRadian = Math.PI / 180 * 155
+        this.horizontalRadian = -0.8142681426814274
+        this.verticelRadian = 2.843021718204985
     }
 
     private createCamera (width: number, height: number) {
@@ -76,5 +76,7 @@ export default class Camera {
         target.add(OFFSET.TARGET)
         this.perspective.lookAt(target)
 
+
+        console.log(this.horizontalRadian, this.verticelRadian)
     }
 }

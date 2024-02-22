@@ -11,9 +11,15 @@ type Pointer = {
 
 }
 
+type Scroll = {
+    deltaTemp: number
+    delta: number
+}
+
 export default class Controls {
 
     pointer: Pointer
+    scroll: Scroll
 
     constructor () {
 
@@ -21,6 +27,11 @@ export default class Controls {
             down: false,
             deltaTemp: new Vector2(),
             delta: new Vector2()
+        }
+
+        this.scroll = {
+            deltaTemp: 0,
+            delta: 0
         }
 
         this.init()
@@ -40,12 +51,16 @@ export default class Controls {
           
             this.pointer.deltaTemp.x += evt.movementX
             this.pointer.deltaTemp.y += evt.movementY
-
-            
+  
         })
 
         window.addEventListener('pointerup', () => {
             this.pointer.down = false
+        })
+
+        // for camera zoom
+        window.addEventListener('wheel', (evt:any) => {
+            console.log(evt.deltaY)
         })
     }
 

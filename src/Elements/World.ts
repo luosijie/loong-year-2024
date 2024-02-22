@@ -1,4 +1,4 @@
-import { AxesHelper, Clock, Group, MeshBasicMaterial, Object3D, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
+import { AxesHelper, Clock, Fog, Group, Mesh, MeshBasicMaterial, Object3D, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
 
 import matcapMaterial from '@/materials/matcap'
 
@@ -17,12 +17,12 @@ import Global from './Global'
 import Controls from './Controls'
 import Door from './Door'
 import setMatcapMaterial from '@/utils/setMatcapMaterial'
+import groundMaterial from '@/materials/groundMaterial'
 const global = Global.getInstance()
 
 // import Sound from './Sound'
 
 export default class World {
-    isDev: boolean
     isReady: boolean
     isActive: boolean
 
@@ -40,6 +40,7 @@ export default class World {
 
     camera: Camera
 
+    fog: Fog
     // sound: Sound
 
 
@@ -53,7 +54,6 @@ export default class World {
     navmesh: Group
 
     constructor (canvas: HTMLCanvasElement, resources: any) {
-        this.isDev = true || checkDev()
         this.isReady = false
         this.isActive = false
 
@@ -91,16 +91,19 @@ export default class World {
         this.scene.add(this.player.main)
         this.scene.add(this.navmesh)
 
-        if (this.isDev) {
+        if (global.isDev) {
             const axesHelper = new AxesHelper(50)
             this.scene.add(axesHelper)
         }
     }
 
     private createNavmesh(model: any) {
-        model.scene.children.forEach((e:any) => {
-            e.material.transparent = true
-            e.material.opacity = 0
+        model.scene.traverse((e:any) => {
+            if (e instanceof Mesh) {
+                e.material.transparent = true
+                e.material.opacity = 0
+
+            }
         })
 
         // mesh.material.transparent = true
@@ -142,18 +145,37 @@ export default class World {
 
     // Build world elements with resources
     build (resources: any) {
-        console.log('resources', resources)
 
+        console.log(resources)
         // set main
-        const modelMain = resources['model-main'].scene.children[0]
-        const textureMain: Texture = resources['texture-main']
-        textureMain.flipY = false   
-        textureMain.colorSpace = SRGBColorSpace
-        
-        const mainMaterial = new MeshBasicMaterial({
-            map: textureMain
+        const modelMain = resources['model-main'].scene
+        modelMain.traverse((e:any) => {
+            if (e.name === 'main') {
+                const textureMain: Texture = resources['texture-main']
+                textureMain.flipY = false   
+                textureMain.colorSpace = SRGBColorSpace
+                
+                const mainMaterial = new MeshBasicMaterial({
+                    map: textureMain
+                })
+                e.material = mainMaterial
+            }
+
+            if (e.name === 'ground') {
+                console.log('-----', e)
+
+                // set ground
+                const textureGround: Texture = resources['texture-ground']
+                textureGround.flipY = false   
+                textureGround.colorSpace = SRGBColorSpace
+                
+                const material = groundMaterial(textureGround)
+                e.position.z = .001
+                e.material = material
+            }
         })
-        modelMain.material = mainMaterial
+
+
         this.scene.add(modelMain)
 
         // set matcaps resources

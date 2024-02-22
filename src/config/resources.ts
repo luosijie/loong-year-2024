@@ -1,6 +1,7 @@
 import { LoaderType } from '../utils/Loader'
 export default [
     { name: 'texture-main', type: LoaderType.Texture, path: '/textures/main.webp'},
+    { name: 'texture-ground', type: LoaderType.Texture, path: '/textures/ground.webp'},
     { name: 'model-main', type: LoaderType.GLTF, path: '/models/main.glb'},
     { name: 'model-matcaps', type: LoaderType.GLTF, path: '/models/matcaps.glb'},
 

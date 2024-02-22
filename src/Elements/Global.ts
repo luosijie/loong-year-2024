@@ -1,3 +1,4 @@
+import checkDev from "@/utils/checkDev"
 
 type Time = {
     elapsed: number
@@ -14,6 +15,8 @@ export default class Global {
     height: number
     pixelRatio: number
 
+    isDev: boolean
+
     constructor () {
         
         this.time = {
@@ -24,6 +27,8 @@ export default class Global {
         this.width = window.innerWidth
         this.height = window.innerHeight
         this.pixelRatio = window.devicePixelRatio
+
+        this.isDev = checkDev()
 
     }
 
