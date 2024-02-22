@@ -18,6 +18,7 @@ export default [
     { name: 'matcap-gold', type: LoaderType.Texture, path: '/matcaps/gold.webp'},
     { name: 'matcap-green', type: LoaderType.Texture, path: '/matcaps/green.webp'},
     { name: 'matcap-red', type: LoaderType.Texture, path: '/matcaps/red.webp'},
+    { name: 'matcap-red-dark', type: LoaderType.Texture, path: '/matcaps/red-dark.webp'},
     { name: 'matcap-yellow', type: LoaderType.Texture, path: '/matcaps/yellow.webp'},
 
     { name: 'matcap-loong-black', type: LoaderType.Texture, path: '/matcaps/loong-black.webp'},
@@ -31,6 +32,10 @@ export default [
 
     { name: 'model-player', type: LoaderType.GLTF, path: '/models/player.glb'},
     { name: 'texture-player', type: LoaderType.Texture, path: '/textures/player.webp'},
+
+    { name: 'model-navmesh', type: LoaderType.GLTF, path: '/models/navmesh.glb'},
+    { name: 'model-door', type: LoaderType.GLTF, path: '/models/door.glb'},
+
 
 
 

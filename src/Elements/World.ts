@@ -1,4 +1,4 @@
-import { AxesHelper, Clock, MeshBasicMaterial, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
+import { AxesHelper, Clock, Group, MeshBasicMaterial, Object3D, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
 
 import matcapMaterial from '@/materials/matcap'
 
@@ -15,6 +15,8 @@ import Player from './Player'
 
 import Global from './Global'
 import Controls from './Controls'
+import Door from './Door'
+import setMatcapMaterial from '@/utils/setMatcapMaterial'
 const global = Global.getInstance()
 
 // import Sound from './Sound'
@@ -42,10 +44,13 @@ export default class World {
 
 
     coin: Coin
+    door: Door
 
     loong: Loong
 
     player: Player
+
+    navmesh: Group
 
     constructor (canvas: HTMLCanvasElement, resources: any) {
         this.isDev = true || checkDev()
@@ -67,15 +72,13 @@ export default class World {
 
         this.camera = new Camera(this.width, this.height)
 
-
+        this.navmesh = this.createNavmesh(resources['model-navmesh'])
     
 
         this.coin = new Coin()
+        this.door = new Door(resources)
 
         this.loong = new Loong()
-
-
-
         
         this.build(resources)
         this.init()
@@ -83,13 +86,26 @@ export default class World {
     }
 
     private init () { 
+        this.scene.add(this.door.group)
         this.scene.add(this.loong.group)
         this.scene.add(this.player.main)
+        this.scene.add(this.navmesh)
 
         if (this.isDev) {
             const axesHelper = new AxesHelper(50)
             this.scene.add(axesHelper)
         }
+    }
+
+    private createNavmesh(model: any) {
+        model.scene.children.forEach((e:any) => {
+            e.material.transparent = true
+            e.material.opacity = 0
+        })
+
+        // mesh.material.transparent = true
+        // mesh.material.opacity = 0
+        return model.scene
     }
 
     private createRenderer () {
@@ -116,7 +132,7 @@ export default class World {
         this.controls.update()
         this.loong.update()
 
-        this.player.update(delta)
+        this.player.update(this.navmesh, this.door)
         this.camera.update(this.player, this.controls)
         
 
@@ -145,22 +161,7 @@ export default class World {
         this.scene.add(modelMatcaps)
 
         modelMatcaps.traverse((e:any) => {
-            if (e.name.includes('gold')) {
-                const m = matcapMaterial(resources['matcap-gold'])
-                e.material = m
-            }
-            if (e.name.includes('green')) {
-                const m = matcapMaterial(resources['matcap-green'])
-                e.material = m
-            }
-            if (e.name.includes('red')) {
-                const m = matcapMaterial(resources['matcap-red'])
-                e.material = m
-            }
-            if (e.name.includes('yellow')) {
-                const m = matcapMaterial(resources['matcap-yellow'])
-                e.material = m
-            }
+            setMatcapMaterial(e, resources)
         })
 
         // set lanterns

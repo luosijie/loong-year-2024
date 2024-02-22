@@ -30,8 +30,8 @@ export default class Camera {
         this.perspective = this.createCamera(width, height)
 
         this.radius = 10
-        this.horizontalRadian = Math.PI
-        this.verticelRadian = Math.PI / 4 * 3.5
+        this.horizontalRadian = 0
+        this.verticelRadian = Math.PI / 180 * 155
     }
 
     private createCamera (width: number, height: number) {

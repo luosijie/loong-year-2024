@@ -1,4 +1,5 @@
-import { AnimationAction, AnimationClip, AnimationMixer, Group, MeshBasicMaterial, Object3D, PerspectiveCamera, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
+import { AnimationAction, AnimationClip, AnimationMixer, Group, MeshBasicMaterial, Object3D, PerspectiveCamera, Ray, Raycaster, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
+import Door from './Door'
 
 type Actions = {
     walking: AnimationAction
@@ -9,6 +10,12 @@ type Actions = {
 const SPEED = {
     WALKING: .05,
     ROTATION: .05
+}
+
+const RAYPOINTS = {
+    ORIGIN: new Vector3(0, 0, .5),
+    DOWN: new Vector3(0, 0, -1),
+    FORWARD: new Vector3(0, -1, 0)
 }
 
 export default class Player {
@@ -23,14 +30,18 @@ export default class Player {
     actions: Actions
 
 
+    walking: boolean
     speed: number
 
     rotation: number
+
+    raycaster: Raycaster
 
 
 
     constructor (resources: any) {
         this.main = new Object3D()
+        this.main.position.set(0, -9, 0)
 
         this.model = resources['model-player']
 
@@ -39,10 +50,13 @@ export default class Player {
 
         this.actions = this.createActions()
 
+        this.walking = false
 
         this.speed = 0
 
         this.rotation = 0
+
+        this.raycaster = new Raycaster()
 
         this.initControls()
 
@@ -83,53 +97,62 @@ export default class Player {
 
     private initControls() {
         window.addEventListener('keydown', (evt:KeyboardEvent) => {
+            this.walk()
             switch (evt.key) {
+                // TODO: player jump
                 case 'Space' :
-                    this.actions.walking.fadeOut(.5)
-
-                    this.actions.jumping.reset()
-                    this.actions.jumping.play()
+                    // this.actions.jumping.reset()
+                    // this.actions.jumping.play()
                     break
                 case 'w':
-                    this.walk(SPEED.WALKING)
+                    this.speed = SPEED.WALKING
                 break
                 case 's':
-                    this.walk(-SPEED.WALKING)
+                    this.speed = -SPEED.WALKING
                 break
                 case 'a':
-                    if (this.speed)
                         this.rotation = SPEED.ROTATION
                     break
                 case 'd':
-                    if (this.speed)
                         this.rotation = -SPEED.ROTATION
 
             }
         })
 
         window.addEventListener('keyup', (evt:KeyboardEvent) => {
+     
+
             switch (evt.key) {
+                // TODO: player jump
+                case 'Space' :
+                    // this.actions.jumping.reset()
+                    // this.actions.jumping.play()
+                    break
                 case 'w':
                     this.speed = 0
-                    this.stand()
-                    break
-                    case 's':
-                        this.speed = 0
-                        this.stand()
-                        break
+                break
+                case 's':
+                    this.speed = 0
+                break
                 case 'a':
-                    this.rotation = 0
+                        this.rotation = 0
                     break
                 case 'd':
-                    this.rotation = 0
+                        this.rotation = 0
+
+            }
+
+            if (this.speed === 0 && this.rotation === 0) {
+                this.walking = false
+                this.stand()
             }
         })
     }
 
-    private walk (speed: number) {
-        if (this.speed) return
-        this.speed = speed
-        this.actions.jumping.fadeOut(.5)
+    private walk () {
+        if (this.walking) return
+        this.walking = true
+        // this.actions.jumping.fadeOut(.5)
         this.actions.walking.reset()
         this.actions.walking.play()
     }
@@ -139,14 +162,46 @@ export default class Player {
     }
 
 
-    update (delta: number) {
+    update (navmesh: Object3D, door: Door) {
         this.animationMixer.update(.02)
-        // this.mesh?.rotation.set(0, 0, elapsedTime)
-        if (this.speed !== 0) this.main.translateY(-this.speed)
 
         if (this.rotation !== 0) this.main.rotateZ(this.rotation)
 
-        const position = new Vector3()
-        this.main.getWorldPosition(position)
+        
+        if (this.speed !== 0) {
+            const target = new Object3D()
+            this.main.getWorldPosition(target.position)
+            target.applyQuaternion(this.main.quaternion)
+            target.translateY(-this.speed * 1.5)
+
+
+            const rayOrigin = new Vector3()
+            target.getWorldPosition(rayOrigin)
+            rayOrigin.add(RAYPOINTS.ORIGIN)
+            
+            // intersect door
+            RAYPOINTS.FORWARD.applyQuaternion(target.quaternion)
+            this.raycaster.set(rayOrigin, RAYPOINTS.FORWARD)
+            const intersectsDoor = this.raycaster.intersectObjects(door.group.children)
+            console.log(intersectsDoor.length)
+            if (intersectsDoor.length) return
+
+            // intersect ground
+            this.raycaster.set(rayOrigin, RAYPOINTS.DOWN)
+
+            const intersects = this.raycaster.intersectObjects([navmesh])
+
+            if (intersects.length > 0) {
+                this.main.position.lerp(intersects[0].point, .6)
+            }
+        }
+
+
+
+
+
+
+        
+
     }
 }
