@@ -1,4 +1,4 @@
-import { BufferGeometry, CurvePath, Group, LineCurve3, Mesh, Object3D, Scene, Vector3 } from 'three'
+import { BufferGeometry, CurvePath, Group, LineCurve3, Mesh, Object3D, Vector3 } from 'three'
 import matcapMaterial from '@/materials/matcap'
 
 const SPEED = 0.0008
