@@ -93,7 +93,7 @@ button {
     margin: 0 auto;
     padding-top: 80px;
     width: 360px;
-    height: 400px;
+    height: 460px;
     border-radius: 30px;
     color:  #333333;
     background: white;
@@ -143,5 +143,15 @@ button {
         text-align: center;
         color: #cccccc;
         cursor: pointer;
+    }
+}
+.guid {
+    margin: 10px;
+    padding: 10px;
+    width:200px;
+    border: 1px solid #999999;
+    border-radius: 10px;
+    p {
+        color: #999999;
     }
 }

@@ -52,7 +52,6 @@ export default class Camera {
             if (this.verticelRadian < min) this.verticelRadian = min
             if (this.verticelRadian > max) this.verticelRadian = max
 
-            console.log(this.verticelRadian)
         }
 
         this.radius += controls.scroll.delta
