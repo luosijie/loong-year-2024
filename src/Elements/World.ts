@@ -166,14 +166,13 @@ export default class World {
                 // set ground
                 const textureGround: Texture = resources['texture-ground']
                 textureGround.flipY = false   
-                textureGround.colorSpace = SRGBColorSpace
+                // textureGround.colorSpace = SRGBColorSpace
                 
                 const material = groundMaterial(textureGround)
-                e.position.z = .001
+                e.position.z = .003
                 e.material = material
             }
         })
-
 
         this.scene.add(modelMain)
 

@@ -41,7 +41,6 @@ export default class Loong {
 
     build (resources: any) {
         // this.mesh = mesh
-        console.log('loong-building', resources)
         const path = resources['model-loong-path'].scene
 
         // set head
@@ -123,7 +122,6 @@ export default class Loong {
 
         const lastLine = new LineCurve3(points[nums - 1], points[0])
         this.path.add(lastLine)
-        console.log(geometry)
     }
 
     
