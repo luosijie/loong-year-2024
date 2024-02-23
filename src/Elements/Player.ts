@@ -1,4 +1,4 @@
-import { AnimationAction, AnimationClip, AnimationMixer, ArrowHelper, BoxGeometry, Group, Mesh, MeshBasicMaterial, Object3D, PerspectiveCamera, PlaneGeometry, Ray, Raycaster, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
+import { AnimationAction, AnimationClip, AnimationMixer, ArrowHelper, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Raycaster, Scene, SRGBColorSpace, Texture, Vector3 } from 'three'
 import Door from './Door'
 
 import fakeShadowMaterial from '@/materials/fakeShadowMaterial'

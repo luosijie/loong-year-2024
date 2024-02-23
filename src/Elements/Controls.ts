@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Vec2, Vector2 } from 'three'
+import { Vector2 } from 'three'
 
 import Global from './Global'
 

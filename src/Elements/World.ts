@@ -1,9 +1,8 @@
-import { AxesHelper, Clock, Fog, Group, Mesh, MeshBasicMaterial, Object3D, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
+import { AxesHelper, Clock, Fog, Group, Mesh, MeshBasicMaterial, Scene, SRGBColorSpace, Texture, Vector3, WebGLRenderer } from 'three'
 
 import matcapMaterial from '@/materials/matcap'
 
 import Camera from './Camera'
-import checkDev from '@/utils/checkDev'
 
 import Coin from './Coin'
 
@@ -129,7 +128,7 @@ export default class World {
 
     // Passed to renderer.setAnimationLoop
     private render () {
-        const delta = this.clock.getDelta()
+        // const delta = this.clock.getDelta()
 
 
         this.controls.update()

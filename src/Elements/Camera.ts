@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+
 import { PerspectiveCamera, Vector2, Vector3 } from 'three'
 import Controls from './Controls'
 import Player from './Player'
@@ -6,13 +6,6 @@ import Player from './Player'
 // Define the relative position of the car
 // const cameraPosition = new Vector3(81.8107, -68.4092, 96.8815).normalize()
 
-
-
-type Pointer = {
-    down: boolean,
-    delta: Vector2
-    deltaTemp: Vector2
-}
 
 const OFFSET = {
     TARGET: new Vector3(0, 0, .1),
