@@ -60,7 +60,7 @@ export default class Controls {
 
         // for camera zoom
         window.addEventListener('wheel', (evt:any) => {
-            console.log(evt.deltaY)
+            this.scroll.deltaTemp += evt.deltaY
         })
     }
 
@@ -79,6 +79,10 @@ export default class Controls {
 
         this.pointer.deltaTemp.x = 0
         this.pointer.deltaTemp.y = 0
+
+
+        this.scroll.delta = this.scroll.deltaTemp
+        this.scroll.deltaTemp = 0
     }
 
 }

@@ -47,9 +47,17 @@ export default class Camera {
             this.horizontalRadian += normalizeDelta.x * 2
             this.verticelRadian -= normalizeDelta.y * 2
 
-            if (this.verticelRadian < 0.1) this.verticelRadian = 0.1
-            if (this.verticelRadian > Math.PI - .1) this.verticelRadian = Math.PI - .1
+            const max = Math.PI / 180 * 160
+            const min = Math.PI / 180 * 91
+            if (this.verticelRadian < min) this.verticelRadian = min
+            if (this.verticelRadian > max) this.verticelRadian = max
+
+            console.log(this.verticelRadian)
         }
+
+        this.radius += controls.scroll.delta
+        if (this.radius > 30) this.radius = 30
+        if (this.radius < 5) this.radius = 5
 
 
         const sinPhiRadius = Math.cos(this.verticelRadian) * this.radius
