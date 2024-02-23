@@ -1,5 +1,5 @@
 
-import { PerspectiveCamera, Vector2, Vector3 } from 'three'
+import { PerspectiveCamera, Vector3 } from 'three'
 import Controls from './Controls'
 import Player from './Player'
 
