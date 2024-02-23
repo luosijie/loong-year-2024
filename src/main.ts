@@ -22,7 +22,8 @@ let world: World
 loader.load(configResources)
 
 const percent = document.querySelector('.percent')
-loader.onFileLoaded(() => {
+loader.onFileLoaded((name:string) => {
+    console.log('load success', name)
     const value: number = loader.totalSuccess / loader.total * 100
     if (percent instanceof HTMLElement) {
         percent.innerText = String(Math.round(value))
