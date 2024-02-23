@@ -253,13 +253,5 @@ export default class Player {
             }
 
         }
-
-
-        console.log(this.main.position)
-
-
-
-        
-
     }
 }

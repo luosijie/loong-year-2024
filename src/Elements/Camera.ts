@@ -68,8 +68,5 @@ export default class Camera {
         player.main.getWorldPosition(target)
         target.add(OFFSET.TARGET)
         this.perspective.lookAt(target)
-
-
-        console.log(this.horizontalRadian, this.verticelRadian)
     }
 }

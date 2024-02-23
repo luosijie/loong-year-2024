@@ -129,10 +129,12 @@ export default class World {
     // Passed to renderer.setAnimationLoop
     private render () {
         // const delta = this.clock.getDelta()
+        const elapsedTime = this.clock.getElapsedTime()
 
 
         this.controls.update()
         this.loong.update()
+        this.coin.update(elapsedTime)
 
         this.player.update(this.navmesh, this.door)
         this.camera.update(this.player, this.controls)
@@ -161,8 +163,6 @@ export default class World {
             }
 
             if (e.name === 'ground') {
-                console.log('-----', e)
-
                 // set ground
                 const textureGround: Texture = resources['texture-ground']
                 textureGround.flipY = false   
