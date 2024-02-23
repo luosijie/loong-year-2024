@@ -54,7 +54,9 @@ export default class Camera {
 
         }
 
-        this.radius += controls.scroll.delta
+        // this.radius += Math.sign(controls.scroll.delta) * .5
+        this.radius += controls.scroll.delta / 100
+
         if (this.radius > 30) this.radius = 30
         if (this.radius < 5) this.radius = 5
 
