@@ -1,21 +1,26 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import * as path from 'path'
 
 import glsl from 'vite-plugin-glsl'
 
-console.log('----', process.env.NODE_ENV)
+// console.log('----', import.meta.env.VITE_SUB_DOMAIN)
 
-export default defineConfig({
-    base:  process.env.NODE_ENV === 'production' ? '/loong-year-2024/' : '/',
-    server: {
-        port: 2024
-    },
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'src')
-        }
-    },
-    plugins: [
-        glsl({ watch: true })
-    ]
+export default defineConfig(({ mode }) => {
+    const root = process.cwd()
+    const env = loadEnv(mode, root)
+
+    return  {
+        base:  env.VITE_SUB_DOMAIN || '/',
+        server: {
+            port: 2024
+        },
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src')
+            }
+        },
+        plugins: [
+            glsl({ watch: true })
+        ]
+    }
 })
